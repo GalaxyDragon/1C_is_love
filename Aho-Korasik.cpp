@@ -267,7 +267,8 @@ void WildcardMatcher::Scan(char character, Callback on_match) {
     }
     ShiftWordOccurrencesCounters();
 }
-
+//пример использования
+/*
 int main() {
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(0);
@@ -281,4 +282,4 @@ int main() {
         matcher.Scan(text[i], [](size_t p) { std::cout << p << " "; });
     }
 }
-
+*/

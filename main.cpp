@@ -21,17 +21,18 @@ class AddressBook{
         return phone_by_secondname_[secondname];
     }
     void add_contact(string& number, string& secondname){
-
+        secondnames_.push_back(secondname);
+        string* secondname_ptr = &(secondnames_[secondnames_.size()-1]);
         phone_by_secondname_[secondname] = number;
         secondname_by_phone_[number] = secondname;
         DigitNode* current_node = root;
         for(char digit:number){
-            current_node->add_family(secondname);
+            current_node->add_secondname(secondname_ptr);
             current_node = current_node->additive_step_by_char(digit);
         }
-        current_node->add_family(secondname);
+        current_node->add_secondname(secondname_ptr);
     }
-    const vector<string>& get_secondname_by_prefix(string &num){
+    const vector<string*>& get_secondname_by_prefix(string &num){
         DigitNode* current_node = root;
         for(auto digit:num){
             current_node=current_node->step_by_char(digit);
@@ -41,7 +42,7 @@ class AddressBook{
         }
         return current_node->get_secondnames();
     }
-    vector<string> stupid_search_by_pattern(string& pattern){
+    vector<string*> stupid_search_by_pattern(string& pattern){
         vector<DigitNode*> condidates;
         condidates.push_back(root);
         for(char digit:pattern){
@@ -63,9 +64,9 @@ class AddressBook{
                 }
             condidates = std::move(temp_condidates);
         }
-        vector<string> answer;
+        vector<string*> answer;
         for(DigitNode* temp_node:condidates){
-            for(const string& family:temp_node->get_secondnames()){
+            for(string* family:temp_node->get_secondnames()){
                 answer.push_back(family);
             }
         }
@@ -90,11 +91,11 @@ class AddressBook{
                }
             return next_nodes[num];
         }
-        const vector<string>& get_secondnames(){
+        const vector<string*>& get_secondnames(){
             return condidates;
         }
-        void add_family(string& new_family){
-         condidates.push_back(new_family);
+        void add_secondname(string* new_secondname){
+         condidates.push_back(new_secondname);
      }
      //для отсутствия такоко костыля можно использовать shared ptr
      // и да, надо следовать правилу 5, но времена такие, времени нет
@@ -106,13 +107,12 @@ class AddressBook{
 
      private:
         vector<DigitNode*> next_nodes = vector<DigitNode*>(10, nullptr);
-        vector<string> condidates;
-        int default_number_size = 0;
+        vector<string*> condidates;
         friend AddressBook;
     };
 
     DigitNode* root = new DigitNode;
-    const vector<string> default_empty_ = vector<string>(0);
+    const vector<string*> default_empty_;
     unordered_map<string,string> phone_by_secondname_;
     unordered_map<string,string> secondname_by_phone_;
     deque<string> secondnames_;
@@ -147,12 +147,12 @@ int main() {
             cout<<"phone:";
             cin>>temp_phone;
             cout<<'\n';
-            const vector<string>& ans = app.get_secondname_by_prefix(temp_phone);
+            const vector<string*> ans = app.get_secondname_by_prefix(temp_phone);
             if(ans.empty()){
                 cout<<"No users found\n";
             }else{
-                for(const string& probably_secondname:ans){
-                    cout<<probably_secondname<<'\n';
+                for(string* probably_secondname:ans){
+                    cout<<*probably_secondname<<'\n';
                 }
             }
         }
@@ -160,12 +160,12 @@ int main() {
             string pattern;
             cout<<"pattern:";
             cin>>pattern;
-            vector<string> ans = app.stupid_search_by_pattern(pattern);
+            vector<string*> ans = app.stupid_search_by_pattern(pattern);
             if(ans.empty()){
                 cout<<"No users found\n";
             } else{
-                for(const string& probably_secondname:ans){
-                    cout<<probably_secondname<<'\n';
+                for(string* probably_secondname:ans){
+                    cout<<*probably_secondname<<'\n';
                 }
             }
         }
