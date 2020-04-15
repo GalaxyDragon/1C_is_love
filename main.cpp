@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <set>
 
+
 using std::vector;
 using std::unordered_map;
 using std::string;
@@ -16,28 +17,29 @@ using std::endl;
 
 class AddressBook{
  public:
-    string phone_by_family(string& family){
-        return phone_by_secondname[family];
+    string phone_by_secondname(string &secondname){
+        return phone_by_secondname_[secondname];
     }
-    void add_contact(string& number, string& family){
-        phone_by_secondname[family] = number;
-        secondname_by_phone[number] = family;
+    void add_contact(string& number, string& secondname){
+
+        phone_by_secondname_[secondname] = number;
+        secondname_by_phone_[number] = secondname;
         DigitNode* current_node = root;
         for(char digit:number){
-            current_node->add_family(family);
+            current_node->add_family(secondname);
             current_node = current_node->additive_step_by_char(digit);
         }
-        current_node->add_family(family);
+        current_node->add_family(secondname);
     }
-    const vector<string>& get_family_by_prefix(string& num){
+    const vector<string>& get_secondname_by_prefix(string &num){
         DigitNode* current_node = root;
         for(auto digit:num){
             current_node=current_node->step_by_char(digit);
             if(current_node== nullptr){
-                return default_empty;
+                return default_empty_;
             }
         }
-        return current_node->get_families();
+        return current_node->get_secondnames();
     }
     vector<string> stupid_search_by_pattern(string& pattern){
         vector<DigitNode*> condidates;
@@ -63,7 +65,7 @@ class AddressBook{
         }
         vector<string> answer;
         for(DigitNode* temp_node:condidates){
-            for(const string& family:temp_node->get_families()){
+            for(const string& family:temp_node->get_secondnames()){
                 answer.push_back(family);
             }
         }
@@ -75,7 +77,7 @@ class AddressBook{
  private:
     struct DigitNode{
         //для оптимизации можно хранить в нодах указатели на строки с именами.
-        //а все имена и номера хранить в отдельных деках
+        //а все имена хранить в отдельных деках
         //(в них не инвалидируются указатели
      public:
         DigitNode* step_by_char(char c){
@@ -88,12 +90,14 @@ class AddressBook{
                }
             return next_nodes[num];
         }
-        const vector<string>& get_families(){
+        const vector<string>& get_secondnames(){
             return condidates;
         }
         void add_family(string& new_family){
          condidates.push_back(new_family);
      }
+     //для отсутствия такоко костыля можно использовать shared ptr
+     // и да, надо следовать правилу 5, но времена такие, времени нет
         ~DigitNode(){
             for(DigitNode* childs:next_nodes){
                 delete childs;
@@ -108,10 +112,10 @@ class AddressBook{
     };
 
     DigitNode* root = new DigitNode;
-    const vector<string> default_empty = vector<string>(0);
-    unordered_map<string,string> phone_by_secondname;
-    unordered_map<string,string> secondname_by_phone;
-
+    const vector<string> default_empty_ = vector<string>(0);
+    unordered_map<string,string> phone_by_secondname_;
+    unordered_map<string,string> secondname_by_phone_;
+    deque<string> secondnames_;
 };
 
 int main() {
@@ -136,14 +140,14 @@ int main() {
             cout<<"family:";
             cin>>temp_family;
             cout<<'\n';
-            cout<<app.phone_by_family(temp_family)<<'\n';
+            cout<< app.phone_by_secondname(temp_family)<<'\n';
         }
         if(option==3){
             string temp_phone;
             cout<<"phone:";
             cin>>temp_phone;
             cout<<'\n';
-            const vector<string>& ans = app.get_family_by_prefix(temp_phone);
+            const vector<string>& ans = app.get_secondname_by_prefix(temp_phone);
             if(ans.empty()){
                 cout<<"No users found\n";
             }else{
