@@ -4,7 +4,7 @@
 #include <deque>
 #include <unordered_map>
 #include <set>
-
+#include <memory>
 
 using std::vector;
 using std::unordered_map;
@@ -14,6 +14,7 @@ using std::set;
 using std::cin;
 using std::cout;
 using std::endl;
+using std::shared_ptr;
 
 class AddressBook{
  public:
@@ -97,7 +98,7 @@ class AddressBook{
         void add_secondname(string* new_secondname){
          condidates.push_back(new_secondname);
      }
-     //для отсутствия такоко костыля можно использовать shared ptr
+     //для отсутствия такоко костыля можно хранить детей в shred_ptr
      // и да, надо следовать правилу 5, но времена такие, времени нет
         ~DigitNode(){
             for(DigitNode* childs:next_nodes){
